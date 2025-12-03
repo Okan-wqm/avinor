@@ -1,14 +1,14 @@
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
+# services/certificate-service/src/apps/core/urls.py
+"""
+Core App URLs
 
-router = DefaultRouter()
-# ViewSets will be registered here when created
-# router.register(r'licenses', LicenseViewSet, basename='license')
-# router.register(r'ratings', RatingViewSet, basename='rating')
-# router.register(r'medical-certificates', MedicalCertificateViewSet, basename='medical-certificate')
-# router.register(r'type-ratings', TypeRatingViewSet, basename='type-rating')
-# router.register(r'endorsements', EndorsementViewSet, basename='endorsement')
+URL routing for core app.
+"""
+
+from django.urls import path, include
+
+app_name = 'core'
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path('', include('apps.core.api.urls')),
 ]
