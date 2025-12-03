@@ -1,0 +1,375 @@
+{
+  "rabbit_version": "3.12.0",
+  "users": [
+    {
+      "name": "admin",
+      "password_hash": "admin_password_change_me",
+      "hashing_algorithm": "rabbit_password_hashing_sha256",
+      "tags": ["administrator"]
+    },
+    {
+      "name": "service_user",
+      "password_hash": "service_password_change_me",
+      "hashing_algorithm": "rabbit_password_hashing_sha256",
+      "tags": []
+    }
+  ],
+  "vhosts": [
+    {
+      "name": "/"
+    }
+  ],
+  "permissions": [
+    {
+      "user": "admin",
+      "vhost": "/",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    },
+    {
+      "user": "service_user",
+      "vhost": "/",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    }
+  ],
+  "topic_permissions": [
+    {
+      "user": "service_user",
+      "vhost": "/",
+      "exchange": "flight_training_events",
+      "write": ".*",
+      "read": ".*"
+    }
+  ],
+  "exchanges": [
+    {
+      "name": "flight_training_events",
+      "vhost": "/",
+      "type": "topic",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    },
+    {
+      "name": "flight_training_events.dlx",
+      "vhost": "/",
+      "type": "topic",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    }
+  ],
+  "queues": [
+    {
+      "name": "user-service_queue",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-dead-letter-exchange": "flight_training_events.dlx",
+        "x-dead-letter-routing-key": "user-service.dlq"
+      }
+    },
+    {
+      "name": "organization-service_queue",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-dead-letter-exchange": "flight_training_events.dlx",
+        "x-dead-letter-routing-key": "organization-service.dlq"
+      }
+    },
+    {
+      "name": "aircraft-service_queue",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-dead-letter-exchange": "flight_training_events.dlx",
+        "x-dead-letter-routing-key": "aircraft-service.dlq"
+      }
+    },
+    {
+      "name": "maintenance-service_queue",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-dead-letter-exchange": "flight_training_events.dlx",
+        "x-dead-letter-routing-key": "maintenance-service.dlq"
+      }
+    },
+    {
+      "name": "booking-service_queue",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-dead-letter-exchange": "flight_training_events.dlx",
+        "x-dead-letter-routing-key": "booking-service.dlq"
+      }
+    },
+    {
+      "name": "flight-service_queue",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-dead-letter-exchange": "flight_training_events.dlx",
+        "x-dead-letter-routing-key": "flight-service.dlq"
+      }
+    },
+    {
+      "name": "training-service_queue",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-dead-letter-exchange": "flight_training_events.dlx",
+        "x-dead-letter-routing-key": "training-service.dlq"
+      }
+    },
+    {
+      "name": "theory-service_queue",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-dead-letter-exchange": "flight_training_events.dlx",
+        "x-dead-letter-routing-key": "theory-service.dlq"
+      }
+    },
+    {
+      "name": "certificate-service_queue",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-dead-letter-exchange": "flight_training_events.dlx",
+        "x-dead-letter-routing-key": "certificate-service.dlq"
+      }
+    },
+    {
+      "name": "finance-service_queue",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-dead-letter-exchange": "flight_training_events.dlx",
+        "x-dead-letter-routing-key": "finance-service.dlq"
+      }
+    },
+    {
+      "name": "document-service_queue",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-dead-letter-exchange": "flight_training_events.dlx",
+        "x-dead-letter-routing-key": "document-service.dlq"
+      }
+    },
+    {
+      "name": "report-service_queue",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-dead-letter-exchange": "flight_training_events.dlx",
+        "x-dead-letter-routing-key": "report-service.dlq"
+      }
+    },
+    {
+      "name": "notification-service_queue",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-dead-letter-exchange": "flight_training_events.dlx",
+        "x-dead-letter-routing-key": "notification-service.dlq"
+      }
+    }
+  ],
+  "bindings": [
+    {
+      "source": "flight_training_events",
+      "vhost": "/",
+      "destination": "user-service_queue",
+      "destination_type": "queue",
+      "routing_key": "user.*",
+      "arguments": {}
+    },
+    {
+      "source": "flight_training_events",
+      "vhost": "/",
+      "destination": "organization-service_queue",
+      "destination_type": "queue",
+      "routing_key": "organization.*",
+      "arguments": {}
+    },
+    {
+      "source": "flight_training_events",
+      "vhost": "/",
+      "destination": "aircraft-service_queue",
+      "destination_type": "queue",
+      "routing_key": "aircraft.*",
+      "arguments": {}
+    },
+    {
+      "source": "flight_training_events",
+      "vhost": "/",
+      "destination": "maintenance-service_queue",
+      "destination_type": "queue",
+      "routing_key": "maintenance.*",
+      "arguments": {}
+    },
+    {
+      "source": "flight_training_events",
+      "vhost": "/",
+      "destination": "maintenance-service_queue",
+      "destination_type": "queue",
+      "routing_key": "aircraft.status_changed",
+      "arguments": {}
+    },
+    {
+      "source": "flight_training_events",
+      "vhost": "/",
+      "destination": "booking-service_queue",
+      "destination_type": "queue",
+      "routing_key": "booking.*",
+      "arguments": {}
+    },
+    {
+      "source": "flight_training_events",
+      "vhost": "/",
+      "destination": "booking-service_queue",
+      "destination_type": "queue",
+      "routing_key": "aircraft.status_changed",
+      "arguments": {}
+    },
+    {
+      "source": "flight_training_events",
+      "vhost": "/",
+      "destination": "flight-service_queue",
+      "destination_type": "queue",
+      "routing_key": "flight.*",
+      "arguments": {}
+    },
+    {
+      "source": "flight_training_events",
+      "vhost": "/",
+      "destination": "flight-service_queue",
+      "destination_type": "queue",
+      "routing_key": "booking.completed",
+      "arguments": {}
+    },
+    {
+      "source": "flight_training_events",
+      "vhost": "/",
+      "destination": "training-service_queue",
+      "destination_type": "queue",
+      "routing_key": "training.*",
+      "arguments": {}
+    },
+    {
+      "source": "flight_training_events",
+      "vhost": "/",
+      "destination": "training-service_queue",
+      "destination_type": "queue",
+      "routing_key": "flight.completed",
+      "arguments": {}
+    },
+    {
+      "source": "flight_training_events",
+      "vhost": "/",
+      "destination": "certificate-service_queue",
+      "destination_type": "queue",
+      "routing_key": "certificate.*",
+      "arguments": {}
+    },
+    {
+      "source": "flight_training_events",
+      "vhost": "/",
+      "destination": "certificate-service_queue",
+      "destination_type": "queue",
+      "routing_key": "training.completed",
+      "arguments": {}
+    },
+    {
+      "source": "flight_training_events",
+      "vhost": "/",
+      "destination": "finance-service_queue",
+      "destination_type": "queue",
+      "routing_key": "finance.*",
+      "arguments": {}
+    },
+    {
+      "source": "flight_training_events",
+      "vhost": "/",
+      "destination": "finance-service_queue",
+      "destination_type": "queue",
+      "routing_key": "flight.completed",
+      "arguments": {}
+    },
+    {
+      "source": "flight_training_events",
+      "vhost": "/",
+      "destination": "finance-service_queue",
+      "destination_type": "queue",
+      "routing_key": "booking.completed",
+      "arguments": {}
+    },
+    {
+      "source": "flight_training_events",
+      "vhost": "/",
+      "destination": "notification-service_queue",
+      "destination_type": "queue",
+      "routing_key": "notification.*",
+      "arguments": {}
+    },
+    {
+      "source": "flight_training_events",
+      "vhost": "/",
+      "destination": "notification-service_queue",
+      "destination_type": "queue",
+      "routing_key": "*.created",
+      "arguments": {}
+    },
+    {
+      "source": "flight_training_events",
+      "vhost": "/",
+      "destination": "notification-service_queue",
+      "destination_type": "queue",
+      "routing_key": "*.expiring",
+      "arguments": {}
+    },
+    {
+      "source": "flight_training_events",
+      "vhost": "/",
+      "destination": "notification-service_queue",
+      "destination_type": "queue",
+      "routing_key": "*.completed",
+      "arguments": {}
+    }
+  ],
+  "policies": [
+    {
+      "vhost": "/",
+      "name": "ha-all",
+      "pattern": ".*",
+      "apply-to": "queues",
+      "definition": {
+        "ha-mode": "all",
+        "ha-sync-mode": "automatic",
+        "queue-mode": "lazy"
+      },
+      "priority": 0
+    }
+  ]
+}

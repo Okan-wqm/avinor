@@ -1,0 +1,24 @@
+; PgBouncer user authentication file
+; Format: "username" "password" or "username" "md5hash"
+
+; Admin users
+"pgbouncer_admin" "admin_password_change_me"
+"pgbouncer_stats" "stats_password_change_me"
+
+; Service users
+"user_service" "user_service_password_change_me"
+"org_service" "org_service_password_change_me"
+"aircraft_service" "aircraft_service_password_change_me"
+"maintenance_service" "maintenance_service_password_change_me"
+"booking_service" "booking_service_password_change_me"
+"flight_service" "flight_service_password_change_me"
+"training_service" "training_service_password_change_me"
+"theory_service" "theory_service_password_change_me"
+"cert_service" "cert_service_password_change_me"
+"finance_service" "finance_service_password_change_me"
+"doc_service" "doc_service_password_change_me"
+"report_service" "report_service_password_change_me"
+"notif_service" "notif_service_password_change_me"
+
+; Replication user
+"replicator" "replicator_secure_password_change_me"

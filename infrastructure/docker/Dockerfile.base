@@ -1,0 +1,80 @@
+# Base Dockerfile for all Django microservices
+# This provides a consistent base image with all common dependencies
+
+FROM python:3.11-slim-bookworm AS base
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONFAULTHANDLER=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libpq-dev \
+    curl \
+    netcat-openbsd \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+
+# Create non-root user for security
+RUN groupadd --gid 1000 appgroup \
+    && useradd --uid 1000 --gid appgroup --shell /bin/bash --create-home appuser
+
+# Set work directory
+WORKDIR /app
+
+# Copy shared library
+COPY --chown=appuser:appgroup shared /app/shared
+
+# ==============================================================================
+# Development Stage
+# ==============================================================================
+FROM base AS development
+
+# Install development dependencies
+RUN pip install --upgrade pip setuptools wheel
+
+# Copy requirements and install
+COPY requirements/base.txt requirements/development.txt /app/requirements/
+RUN pip install -r /app/requirements/development.txt
+
+# Switch to non-root user
+USER appuser
+
+# Default command for development
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+
+# ==============================================================================
+# Production Stage
+# ==============================================================================
+FROM base AS production
+
+# Install production dependencies only
+RUN pip install --upgrade pip setuptools wheel
+
+# Copy requirements and install
+COPY requirements/base.txt requirements/production.txt /app/requirements/
+RUN pip install -r /app/requirements/production.txt
+
+# Copy application code
+COPY --chown=appuser:appgroup . /app
+
+# Collect static files
+RUN python manage.py collectstatic --noinput --clear 2>/dev/null || true
+
+# Switch to non-root user
+USER appuser
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8000/health/ || exit 1
+
+# Run with gunicorn
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "4", "--threads", "2", \
+     "--worker-class", "gthread", "--worker-tmp-dir", "/dev/shm", \
+     "--access-logfile", "-", "--error-logfile", "-", \
+     "--capture-output", "--enable-stdio-inheritance", \
+     "config.wsgi:application"]

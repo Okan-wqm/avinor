@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -m django startproject:*)",
+      "Bash(python3:*)",
+      "Bash(where:*)",
+      "Bash(py:*)",
+      "Bash(cmd.exe /c \"python --version\")",
+      "Bash(/c/Users/*/AppData/Local/Programs/Python/Python*/python.exe)",
+      "Bash(/j/PycharmProjects/Avinor/venv/Scripts/python.exe -m pip install:*)",
+      "Bash(done)",
+      "Bash(git init:*)",
+      "Bash(git remote add:*)",
+      "Bash(git add:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
