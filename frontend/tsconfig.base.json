@@ -1,0 +1,37 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "rootDir": ".",
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "ES2022",
+    "module": "ES2022",
+    "lib": ["ES2022", "dom"],
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "strict": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
+    "paths": {
+      "@fts/shared/ui": ["libs/shared/ui/src/index.ts"],
+      "@fts/shared/auth": ["libs/shared/auth/src/index.ts"],
+      "@fts/shared/data-access": ["libs/shared/data-access/src/index.ts"],
+      "@fts/shared/util": ["libs/shared/util/src/index.ts"],
+      "@fts/shared/models": ["libs/shared/models/src/index.ts"],
+      "@fts/domain/booking": ["libs/domain/booking/src/index.ts"],
+      "@fts/domain/flight": ["libs/domain/flight/src/index.ts"],
+      "@fts/domain/training": ["libs/domain/training/src/index.ts"],
+      "@fts/domain/aircraft": ["libs/domain/aircraft/src/index.ts"],
+      "@fts/domain/user": ["libs/domain/user/src/index.ts"]
+    }
+  },
+  "exclude": ["node_modules", "tmp"]
+}

@@ -1,0 +1,52 @@
+{
+  "name": "operations",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/operations/src",
+  "prefix": "fts",
+  "tags": ["type:app", "scope:operations"],
+  "targets": {
+    "build": {
+      "executor": "@angular-architects/module-federation:build",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/operations",
+        "index": "apps/operations/src/index.html",
+        "main": "apps/operations/src/main.ts",
+        "polyfills": ["zone.js"],
+        "tsConfig": "apps/operations/tsconfig.app.json",
+        "inlineStyleLanguage": "scss",
+        "assets": ["apps/operations/src/assets"],
+        "styles": ["apps/operations/src/styles.scss"],
+        "scripts": []
+      },
+      "configurations": {
+        "production": {
+          "outputHashing": "all"
+        },
+        "development": {
+          "optimization": false,
+          "extractLicenses": false,
+          "sourceMap": true
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "serve": {
+      "executor": "@angular-architects/module-federation:dev-server",
+      "options": {
+        "port": 4201,
+        "publicHost": "http://localhost:4201"
+      },
+      "configurations": {
+        "production": {
+          "buildTarget": "operations:build:production"
+        },
+        "development": {
+          "buildTarget": "operations:build:development"
+        }
+      },
+      "defaultConfiguration": "development"
+    }
+  }
+}
