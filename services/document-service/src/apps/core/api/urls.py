@@ -1,12 +1,12 @@
-# services/document-service/src/apps/core/urls.py
+# services/document-service/src/apps/core/api/urls.py
 """
-Core app URL configuration
+Document Service API URL Configuration
 """
 
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
-from .api.views import (
+from .views import (
     DocumentViewSet,
     FolderViewSet,
     SignatureViewSet,
@@ -15,7 +15,7 @@ from .api.views import (
     ShareViewSet,
     PublicShareView,
 )
-from .api.views.share_views import PublicShareDownloadView
+from .views.share_views import PublicShareDownloadView
 
 
 # Create router
@@ -29,12 +29,10 @@ router.register(r'shares', ShareViewSet, basename='share')
 
 
 urlpatterns = [
-    # API endpoints
-    path('', include(router.urls)),
-]
+    # API v1
+    path('api/v1/', include(router.urls)),
 
-# Public share endpoints (at root level, added via config/urls.py)
-public_urlpatterns = [
+    # Public share endpoints (no auth required)
     path(
         'share/<str:token>/',
         PublicShareView.as_view(),
