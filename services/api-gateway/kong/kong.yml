@@ -1,0 +1,589 @@
+# services/api-gateway/kong/kong.yml
+# Kong Declarative Configuration
+# This file is loaded on Kong startup
+
+_format_version: "3.0"
+_transform: true
+
+# =============================================================================
+# SERVICES - Microservice Definitions
+# =============================================================================
+services:
+  # ---------------------------------------------------------------------------
+  # User Service (Port 8001)
+  # ---------------------------------------------------------------------------
+  - name: user-service
+    url: http://user-service:8001
+    connect_timeout: 10000
+    write_timeout: 60000
+    read_timeout: 60000
+    retries: 3
+    tags:
+      - core
+      - auth
+    routes:
+      - name: user-routes
+        paths:
+          - /api/v1/users
+          - /api/v1/roles
+          - /api/v1/permissions
+        methods:
+          - GET
+          - POST
+          - PUT
+          - PATCH
+          - DELETE
+          - OPTIONS
+        strip_path: false
+        preserve_host: true
+
+      - name: auth-routes
+        paths:
+          - /api/v1/auth
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+        preserve_host: true
+
+  # ---------------------------------------------------------------------------
+  # Organization Service (Port 8002)
+  # ---------------------------------------------------------------------------
+  - name: organization-service
+    url: http://organization-service:8002
+    connect_timeout: 10000
+    write_timeout: 60000
+    read_timeout: 60000
+    retries: 3
+    tags:
+      - core
+    routes:
+      - name: organization-routes
+        paths:
+          - /api/v1/organizations
+          - /api/v1/locations
+          - /api/v1/subscriptions
+          - /api/v1/invitations
+        strip_path: false
+        preserve_host: true
+
+  # ---------------------------------------------------------------------------
+  # Aircraft Service (Port 8003)
+  # ---------------------------------------------------------------------------
+  - name: aircraft-service
+    url: http://aircraft-service:8003
+    connect_timeout: 10000
+    write_timeout: 60000
+    read_timeout: 60000
+    retries: 3
+    tags:
+      - operations
+    routes:
+      - name: aircraft-routes
+        paths:
+          - /api/v1/aircraft
+          - /api/v1/aircraft-types
+          - /api/v1/squawks
+        strip_path: false
+        preserve_host: true
+
+  # ---------------------------------------------------------------------------
+  # Booking Service (Port 8004)
+  # ---------------------------------------------------------------------------
+  - name: booking-service
+    url: http://booking-service:8004
+    connect_timeout: 10000
+    write_timeout: 60000
+    read_timeout: 60000
+    retries: 3
+    tags:
+      - operations
+    routes:
+      - name: booking-routes
+        paths:
+          - /api/v1/bookings
+          - /api/v1/availability
+          - /api/v1/waitlist
+          - /api/v1/recurring
+        strip_path: false
+        preserve_host: true
+
+  # ---------------------------------------------------------------------------
+  # Flight Service (Port 8005)
+  # ---------------------------------------------------------------------------
+  - name: flight-service
+    url: http://flight-service:8005
+    connect_timeout: 10000
+    write_timeout: 60000
+    read_timeout: 60000
+    retries: 3
+    tags:
+      - operations
+    routes:
+      - name: flight-routes
+        paths:
+          - /api/v1/flights
+          - /api/v1/logbook
+          - /api/v1/approaches
+          - /api/v1/fuel
+        strip_path: false
+        preserve_host: true
+
+  # ---------------------------------------------------------------------------
+  # Weather Service (Port 8006)
+  # ---------------------------------------------------------------------------
+  - name: weather-service
+    url: http://weather-service:8006
+    connect_timeout: 10000
+    write_timeout: 30000
+    read_timeout: 30000
+    retries: 2
+    tags:
+      - external
+    routes:
+      - name: weather-routes
+        paths:
+          - /api/v1/weather
+          - /api/v1/metar
+          - /api/v1/taf
+          - /api/v1/notam
+        strip_path: false
+        preserve_host: true
+
+  # ---------------------------------------------------------------------------
+  # Training Service (Port 8007)
+  # ---------------------------------------------------------------------------
+  - name: training-service
+    url: http://training-service:8007
+    connect_timeout: 10000
+    write_timeout: 60000
+    read_timeout: 60000
+    retries: 3
+    tags:
+      - training
+    routes:
+      - name: training-routes
+        paths:
+          - /api/v1/training
+          - /api/v1/syllabi
+          - /api/v1/lessons
+          - /api/v1/progress
+        strip_path: false
+        preserve_host: true
+
+  # ---------------------------------------------------------------------------
+  # Theory Service (Port 8008)
+  # ---------------------------------------------------------------------------
+  - name: theory-service
+    url: http://theory-service:8008
+    connect_timeout: 10000
+    write_timeout: 60000
+    read_timeout: 60000
+    retries: 3
+    tags:
+      - training
+    routes:
+      - name: theory-routes
+        paths:
+          - /api/v1/theory
+          - /api/v1/courses
+          - /api/v1/exams
+          - /api/v1/questions
+          - /api/v1/enrollments
+        strip_path: false
+        preserve_host: true
+
+  # ---------------------------------------------------------------------------
+  # Certificate Service (Port 8009)
+  # ---------------------------------------------------------------------------
+  - name: certificate-service
+    url: http://certificate-service:8009
+    connect_timeout: 10000
+    write_timeout: 60000
+    read_timeout: 60000
+    retries: 3
+    tags:
+      - compliance
+    routes:
+      - name: certificate-routes
+        paths:
+          - /api/v1/certificates
+          - /api/v1/medicals
+          - /api/v1/ratings
+          - /api/v1/endorsements
+          - /api/v1/currency
+        strip_path: false
+        preserve_host: true
+
+  # ---------------------------------------------------------------------------
+  # Finance Service (Port 8010)
+  # ---------------------------------------------------------------------------
+  - name: finance-service
+    url: http://finance-service:8010
+    connect_timeout: 10000
+    write_timeout: 60000
+    read_timeout: 60000
+    retries: 3
+    tags:
+      - finance
+    routes:
+      - name: finance-routes
+        paths:
+          - /api/v1/accounts
+          - /api/v1/transactions
+          - /api/v1/invoices
+          - /api/v1/pricing
+          - /api/v1/packages
+          - /api/v1/payments
+        strip_path: false
+        preserve_host: true
+
+  # ---------------------------------------------------------------------------
+  # Document Service (Port 8011)
+  # ---------------------------------------------------------------------------
+  - name: document-service
+    url: http://document-service:8011
+    connect_timeout: 10000
+    write_timeout: 120000  # Longer for file uploads
+    read_timeout: 120000
+    retries: 2
+    tags:
+      - storage
+    routes:
+      - name: document-routes
+        paths:
+          - /api/v1/documents
+          - /api/v1/folders
+          - /api/v1/templates
+          - /api/v1/signatures
+          - /api/v1/shares
+        strip_path: false
+        preserve_host: true
+
+      - name: public-share-routes
+        paths:
+          - /share
+        strip_path: false
+        preserve_host: true
+
+  # ---------------------------------------------------------------------------
+  # Maintenance Service (Port 8012)
+  # ---------------------------------------------------------------------------
+  - name: maintenance-service
+    url: http://maintenance-service:8012
+    connect_timeout: 10000
+    write_timeout: 60000
+    read_timeout: 60000
+    retries: 3
+    tags:
+      - operations
+    routes:
+      - name: maintenance-routes
+        paths:
+          - /api/v1/maintenance
+          - /api/v1/work-orders
+          - /api/v1/parts
+          - /api/v1/compliance
+        strip_path: false
+        preserve_host: true
+
+  # ---------------------------------------------------------------------------
+  # Report Service (Port 8013)
+  # ---------------------------------------------------------------------------
+  - name: report-service
+    url: http://report-service:8013
+    connect_timeout: 10000
+    write_timeout: 300000  # Long timeout for report generation
+    read_timeout: 300000
+    retries: 1
+    tags:
+      - analytics
+    routes:
+      - name: report-routes
+        paths:
+          - /api/v1/reports
+        strip_path: false
+        preserve_host: true
+
+  # ---------------------------------------------------------------------------
+  # Notification Service (Port 8014)
+  # ---------------------------------------------------------------------------
+  - name: notification-service
+    url: http://notification-service:8014
+    connect_timeout: 10000
+    write_timeout: 30000
+    read_timeout: 30000
+    retries: 3
+    tags:
+      - messaging
+    routes:
+      - name: notification-routes
+        paths:
+          - /api/v1/notifications
+          - /api/v1/email
+          - /api/v1/sms
+          - /api/v1/push
+        strip_path: false
+        preserve_host: true
+
+# =============================================================================
+# GLOBAL PLUGINS
+# =============================================================================
+plugins:
+  # ---------------------------------------------------------------------------
+  # CORS - Cross-Origin Resource Sharing
+  # ---------------------------------------------------------------------------
+  - name: cors
+    config:
+      origins:
+        - "https://app.flightschool.com"
+        - "https://*.flightschool.com"
+        - "http://localhost:4200"
+        - "http://localhost:3000"
+      methods:
+        - GET
+        - POST
+        - PUT
+        - PATCH
+        - DELETE
+        - OPTIONS
+        - HEAD
+      headers:
+        - Accept
+        - Accept-Version
+        - Authorization
+        - Content-Type
+        - Content-Length
+        - X-Organization-ID
+        - X-Request-ID
+        - X-Requested-With
+      exposed_headers:
+        - X-Request-ID
+        - X-RateLimit-Limit
+        - X-RateLimit-Remaining
+        - X-RateLimit-Reset
+        - Content-Disposition
+      credentials: true
+      max_age: 3600
+      preflight_continue: false
+
+  # ---------------------------------------------------------------------------
+  # Request ID / Correlation ID
+  # ---------------------------------------------------------------------------
+  - name: correlation-id
+    config:
+      header_name: X-Request-ID
+      generator: uuid#counter
+      echo_downstream: true
+
+  # ---------------------------------------------------------------------------
+  # Rate Limiting (Global - Redis backed)
+  # ---------------------------------------------------------------------------
+  - name: rate-limiting
+    config:
+      minute: 1000
+      hour: 10000
+      policy: redis
+      redis_host: redis
+      redis_port: 6379
+      redis_database: 2
+      redis_timeout: 2000
+      fault_tolerant: true
+      hide_client_headers: false
+      error_code: 429
+      error_message: "Rate limit exceeded. Please slow down."
+
+  # ---------------------------------------------------------------------------
+  # Request Size Limiting (Global - 10MB default)
+  # ---------------------------------------------------------------------------
+  - name: request-size-limiting
+    config:
+      allowed_payload_size: 10
+      size_unit: megabytes
+      require_content_length: false
+
+  # ---------------------------------------------------------------------------
+  # Response Headers (Security)
+  # ---------------------------------------------------------------------------
+  - name: response-transformer
+    config:
+      add:
+        headers:
+          - "X-Content-Type-Options:nosniff"
+          - "X-Frame-Options:DENY"
+          - "X-XSS-Protection:1; mode=block"
+          - "Referrer-Policy:strict-origin-when-cross-origin"
+          - "X-API-Version:v1"
+      remove:
+        headers:
+          - "Server"
+          - "X-Powered-By"
+
+  # ---------------------------------------------------------------------------
+  # IP Restriction (Whitelist for Admin)
+  # ---------------------------------------------------------------------------
+  - name: ip-restriction
+    route: admin-routes
+    config:
+      allow:
+        - 127.0.0.1
+        - 10.0.0.0/8
+        - 172.16.0.0/12
+        - 192.168.0.0/16
+
+  # ---------------------------------------------------------------------------
+  # Bot Detection
+  # ---------------------------------------------------------------------------
+  - name: bot-detection
+    config:
+      allow:
+        - googlebot
+        - bingbot
+      deny:
+        - masscan
+        - nikto
+
+  # ---------------------------------------------------------------------------
+  # Prometheus Metrics
+  # ---------------------------------------------------------------------------
+  - name: prometheus
+    config:
+      per_consumer: true
+      status_code_metrics: true
+      latency_metrics: true
+      bandwidth_metrics: true
+      upstream_health_metrics: true
+
+# =============================================================================
+# SERVICE-SPECIFIC PLUGINS
+# =============================================================================
+
+  # ---------------------------------------------------------------------------
+  # Auth Routes - Stricter Rate Limiting (Brute Force Protection)
+  # ---------------------------------------------------------------------------
+  - name: rate-limiting
+    route: auth-routes
+    config:
+      minute: 20
+      hour: 100
+      policy: redis
+      redis_host: redis
+      redis_port: 6379
+      redis_database: 2
+      fault_tolerant: true
+      error_message: "Too many authentication attempts. Please try again later."
+
+  # ---------------------------------------------------------------------------
+  # Finance Service - Stricter Rate Limiting
+  # ---------------------------------------------------------------------------
+  - name: rate-limiting
+    service: finance-service
+    config:
+      minute: 100
+      hour: 1000
+      policy: redis
+      redis_host: redis
+      redis_port: 6379
+      redis_database: 2
+
+  # ---------------------------------------------------------------------------
+  # Document Service - Larger Payload Size (100MB for uploads)
+  # ---------------------------------------------------------------------------
+  - name: request-size-limiting
+    service: document-service
+    config:
+      allowed_payload_size: 100
+      size_unit: megabytes
+
+  # ---------------------------------------------------------------------------
+  # Report Service - Longer Timeout
+  # ---------------------------------------------------------------------------
+  - name: request-termination
+    service: report-service
+    config:
+      status_code: 504
+      message: "Report generation timeout"
+      trigger: null
+
+  # ---------------------------------------------------------------------------
+  # Public Share Routes - No Auth Required
+  # ---------------------------------------------------------------------------
+  - name: request-transformer
+    route: public-share-routes
+    config:
+      add:
+        headers:
+          - "X-Public-Access:true"
+
+# =============================================================================
+# UPSTREAMS (For Load Balancing - Future Use)
+# =============================================================================
+upstreams:
+  - name: user-service-upstream
+    algorithm: round-robin
+    hash_on: none
+    healthchecks:
+      active:
+        type: http
+        http_path: /health/
+        timeout: 5
+        concurrency: 10
+        healthy:
+          interval: 10
+          successes: 2
+          http_statuses:
+            - 200
+            - 302
+        unhealthy:
+          interval: 5
+          http_failures: 3
+          timeouts: 3
+          http_statuses:
+            - 429
+            - 500
+            - 503
+      passive:
+        type: http
+        healthy:
+          successes: 5
+          http_statuses:
+            - 200
+            - 201
+            - 204
+            - 301
+            - 302
+        unhealthy:
+          http_failures: 5
+          timeouts: 3
+          http_statuses:
+            - 429
+            - 500
+            - 503
+    targets:
+      - target: user-service:8001
+        weight: 100
+
+# =============================================================================
+# CONSUMERS (API Keys for Third-party)
+# =============================================================================
+consumers:
+  - username: mobile-app
+    custom_id: mobile-app-001
+    tags:
+      - mobile
+      - internal
+
+  - username: web-app
+    custom_id: web-app-001
+    tags:
+      - web
+      - internal
+
+  - username: third-party-integration
+    custom_id: third-party-001
+    tags:
+      - external
+      - partner
