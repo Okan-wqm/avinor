@@ -64,6 +64,52 @@ from .flight_time_limitations import (
     PilotFTLSummary,
     FTLStandard,
 )
+from .rating_revalidation import (
+    RatingRevalidationRule,
+    RatingRevalidation,
+    RatingExperienceLog,
+    RatingCategory,
+    RevalidationType,
+    RevalidationStatus,
+    FCL740Requirements,
+    DEFAULT_REVALIDATION_RULES,
+)
+from .instructor import (
+    InstructorCertificate,
+    InstructorRevalidation,
+    InstructorActivity,
+    InstructorCategory,
+    InstructorStatus,
+    InstructorPrivilege,
+    FCL915Requirements,
+)
+from .examiner import (
+    ExaminerAuthorization,
+    ExaminationRecord,
+    ExaminerRevalidation,
+    ExaminerCategory,
+    ExaminerStatus,
+    ExaminerPrivilege,
+    FCL1010Requirements,
+)
+from .theoretical_exam import (
+    TheoreticalExamEnrollment,
+    TheoreticalExamResult,
+    TheoreticalExamSchedule,
+    ExamLicenseType,
+    ExamSubject,
+    ExamStatus,
+    FCL025Requirements,
+)
+from .experience_crediting import (
+    ExperienceCredit,
+    ExperienceRequirement,
+    PilotExperienceLog,
+    CreditingType,
+    CreditingStatus,
+    FCL035CreditRules,
+    DEFAULT_EXPERIENCE_REQUIREMENTS,
+)
 
 __all__ = [
     # Certificate
@@ -115,4 +161,45 @@ __all__ = [
     'FTLViolationType',
     'PilotFTLSummary',
     'FTLStandard',
+    # Rating Revalidation (FCL.740/745)
+    'RatingRevalidationRule',
+    'RatingRevalidation',
+    'RatingExperienceLog',
+    'RatingCategory',
+    'RevalidationType',
+    'RevalidationStatus',
+    'FCL740Requirements',
+    'DEFAULT_REVALIDATION_RULES',
+    # Instructor (FCL.900-930)
+    'InstructorCertificate',
+    'InstructorRevalidation',
+    'InstructorActivity',
+    'InstructorCategory',
+    'InstructorStatus',
+    'InstructorPrivilege',
+    'FCL915Requirements',
+    # Examiner (FCL.945-1025)
+    'ExaminerAuthorization',
+    'ExaminationRecord',
+    'ExaminerRevalidation',
+    'ExaminerCategory',
+    'ExaminerStatus',
+    'ExaminerPrivilege',
+    'FCL1010Requirements',
+    # Theoretical Exams (FCL.025)
+    'TheoreticalExamEnrollment',
+    'TheoreticalExamResult',
+    'TheoreticalExamSchedule',
+    'ExamLicenseType',
+    'ExamSubject',
+    'ExamStatus',
+    'FCL025Requirements',
+    # Experience Crediting (FCL.035)
+    'ExperienceCredit',
+    'ExperienceRequirement',
+    'PilotExperienceLog',
+    'CreditingType',
+    'CreditingStatus',
+    'FCL035CreditRules',
+    'DEFAULT_EXPERIENCE_REQUIREMENTS',
 ]

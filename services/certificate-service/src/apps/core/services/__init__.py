@@ -22,6 +22,12 @@ from .validity_service import ValidityService, AgeLimit
 from .language_proficiency_service import LanguageProficiencyService
 from .flight_review_service import FlightReviewService
 from .ftl_service import FTLService
+from .rating_revalidation_service import RatingRevalidationService
+from .medical_validity_service import (
+    MedicalValidityService,
+    EASAMedicalRules,
+    FAAMedicalRules,
+)
 
 __all__ = [
     'CertificateService',
@@ -37,4 +43,8 @@ __all__ = [
     'LanguageProficiencyService',
     'FlightReviewService',
     'FTLService',
+    'RatingRevalidationService',
+    'MedicalValidityService',
+    'EASAMedicalRules',
+    'FAAMedicalRules',
 ]
