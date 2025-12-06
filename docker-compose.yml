@@ -470,6 +470,41 @@ services:
       - ftms-network
     restart: unless-stopped
 
+  # Simulator Service (FSTD Management)
+  simulator-service:
+    build:
+      context: .
+      dockerfile: services/simulator-service/docker/Dockerfile
+    container_name: ftms-simulator-service
+    environment:
+      - DJANGO_ENV=development
+      - SECRET_KEY=${SECRET_KEY:-dev-secret-key-change-in-production}
+      - DB_HOST=postgres-primary
+      - DB_NAME=simulator_db
+      - DB_USER=simulator_service
+      - DB_PASSWORD=${SIMULATOR_SERVICE_DB_PASSWORD:-simulator_service_password_change_me}
+      - REDIS_URL=redis://redis:6379/14
+      - NATS_SERVERS=nats://nats:4222
+      - NATS_USER=${NATS_USER:-admin}
+      - NATS_PASSWORD=${NATS_PASSWORD:-nats_password}
+      - SERVICE_NAME=simulator-service
+      - SERVICE_PORT=8014
+    ports:
+      - "8014:8014"
+    depends_on:
+      postgres-primary:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      nats:
+        condition: service_healthy
+    volumes:
+      - ./services/simulator-service/src:/app
+      - ./shared:/app/shared
+    networks:
+      - ftms-network
+    restart: unless-stopped
+
   # ===========================================================================
   # API GATEWAY - KONG
   # ===========================================================================

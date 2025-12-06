@@ -17,14 +17,27 @@ class ReportTemplate(UUIDPrimaryKeyMixin, TimestampMixin, models.Model):
         AIRCRAFT_UTILIZATION = 'aircraft_utilization', 'Aircraft Utilization'
         MAINTENANCE = 'maintenance', 'Maintenance Report'
         INSTRUCTOR_ACTIVITY = 'instructor_activity', 'Instructor Activity'
+        SIMULATOR_USAGE = 'simulator_usage', 'Simulator Usage'
+        COMPLIANCE = 'compliance', 'Compliance Report'
+        SAFETY = 'safety', 'Safety Report'
         CUSTOM = 'custom', 'Custom Report'
 
-    organization_id = models.UUIDField()
+    class Category(models.TextChoices):
+        OPERATIONAL = 'operational', 'Operasyonel'
+        COMPLIANCE = 'compliance', 'Uyumluluk'
+        MANAGEMENT = 'management', 'Yönetim'
+        FINANCIAL = 'financial', 'Finansal'
+        SAFETY = 'safety', 'Güvenlik'
+
+    organization_id = models.UUIDField(null=True, blank=True, db_index=True)  # Null for system templates
 
     # Template details
+    code = models.CharField(max_length=100, db_index=True, blank=True)  # Unique template code
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     report_type = models.CharField(max_length=30, choices=ReportType.choices)
+    category = models.CharField(max_length=50, choices=Category.choices, default=Category.OPERATIONAL)
+    is_system = models.BooleanField(default=False)  # System template flag
 
     # Query configuration
     data_source = models.CharField(max_length=100)  # Which service to query
@@ -47,6 +60,11 @@ class ReportTemplate(UUIDPrimaryKeyMixin, TimestampMixin, models.Model):
     # Status
     is_active = models.BooleanField(default=True)
 
+    # Output formats
+    output_formats = models.JSONField(default=list, blank=True)  # ['pdf', 'excel', 'csv']
+    available_filters = models.JSONField(default=list, blank=True)  # Available filter options
+    default_filters = models.JSONField(default=dict, blank=True)  # Default filter values
+
     class Meta:
         db_table = 'report_templates'
         ordering = ['name']
@@ -54,6 +72,8 @@ class ReportTemplate(UUIDPrimaryKeyMixin, TimestampMixin, models.Model):
             models.Index(fields=['organization_id']),
             models.Index(fields=['report_type']),
             models.Index(fields=['is_active']),
+            models.Index(fields=['category']),
+            models.Index(fields=['code']),
         ]
 
     def __str__(self):

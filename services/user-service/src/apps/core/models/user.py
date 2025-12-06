@@ -137,6 +137,12 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     # Demographics
     date_of_birth = models.DateField(blank=True, null=True)
+    place_of_birth = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        help_text='Place of birth (required for pilot license applications)'
+    )
     gender = models.CharField(
         max_length=20,
         choices=Gender.choices,

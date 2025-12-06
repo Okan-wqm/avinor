@@ -108,7 +108,8 @@ class Notification(UUIDPrimaryKeyMixin, TimestampMixin, models.Model):
 class NotificationPreference(UUIDPrimaryKeyMixin, TimestampMixin, models.Model):
     """User notification preferences."""
 
-    user_id = models.UUIDField()
+    user_id = models.UUIDField(db_index=True)
+    organization_id = models.UUIDField(db_index=True)
 
     # Channel preferences
     email_enabled = models.BooleanField(default=True)
@@ -128,7 +129,10 @@ class NotificationPreference(UUIDPrimaryKeyMixin, TimestampMixin, models.Model):
 
     class Meta:
         db_table = 'notification_preferences'
-        unique_together = ['user_id']
+        unique_together = ['user_id', 'organization_id']
+        indexes = [
+            models.Index(fields=['user_id', 'organization_id']),
+        ]
 
 
 class DeviceToken(UUIDPrimaryKeyMixin, TimestampMixin, models.Model):
@@ -190,3 +194,49 @@ class NotificationBatch(UUIDPrimaryKeyMixin, TimestampMixin, models.Model):
     class Meta:
         db_table = 'notification_batches'
         ordering = ['-created_at']
+
+
+class NotificationLog(UUIDPrimaryKeyMixin, models.Model):
+    """Delivery log for notifications - audit trail."""
+
+    class EventType(models.TextChoices):
+        CREATED = 'created', 'Created'
+        QUEUED = 'queued', 'Queued'
+        SENDING = 'sending', 'Sending'
+        SENT = 'sent', 'Sent'
+        DELIVERED = 'delivered', 'Delivered'
+        OPENED = 'opened', 'Opened'
+        CLICKED = 'clicked', 'Clicked'
+        BOUNCED = 'bounced', 'Bounced'
+        FAILED = 'failed', 'Failed'
+        RETRYING = 'retrying', 'Retrying'
+
+    notification = models.ForeignKey(
+        Notification,
+        on_delete=models.CASCADE,
+        related_name='logs'
+    )
+
+    event_type = models.CharField(max_length=20, choices=EventType.choices)
+    event_at = models.DateTimeField(auto_now_add=True)
+
+    # Provider response
+    provider_name = models.CharField(max_length=50, blank=True)  # sendgrid, twilio, firebase
+    provider_response = models.JSONField(default=dict, blank=True)
+    provider_message_id = models.CharField(max_length=255, blank=True)
+
+    # Additional info
+    details = models.TextField(blank=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    user_agent = models.TextField(blank=True)
+
+    class Meta:
+        db_table = 'notification_logs'
+        ordering = ['-event_at']
+        indexes = [
+            models.Index(fields=['notification', '-event_at']),
+            models.Index(fields=['event_type']),
+        ]
+
+    def __str__(self):
+        return f"{self.notification_id} - {self.event_type} at {self.event_at}"

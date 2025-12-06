@@ -158,6 +158,17 @@ CREATE USER notif_service WITH ENCRYPTED PASSWORD 'notif_service_password_change
 GRANT ALL PRIVILEGES ON DATABASE notif_db TO notif_service;
 ALTER DATABASE notif_db OWNER TO notif_service;
 
+-- Simulator Service Database
+CREATE DATABASE simulator_db
+    WITH ENCODING = 'UTF8'
+    LC_COLLATE = 'en_US.UTF-8'
+    LC_CTYPE = 'en_US.UTF-8'
+    TEMPLATE = template0;
+
+CREATE USER simulator_service WITH ENCRYPTED PASSWORD 'simulator_service_password_change_me';
+GRANT ALL PRIVILEGES ON DATABASE simulator_db TO simulator_service;
+ALTER DATABASE simulator_db OWNER TO simulator_service;
+
 -- =============================================================================
 -- GRANT SCHEMA PERMISSIONS
 -- =============================================================================
@@ -217,6 +228,9 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "tablefunc";
 
 \c notif_db
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+\c simulator_db
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Return to default database
