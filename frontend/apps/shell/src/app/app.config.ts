@@ -5,7 +5,7 @@ import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideServiceWorker } from '@angular/service-worker';
 
 import { APP_ROUTES } from './app.routes';
-import { GlobalErrorHandler } from './core/services/error-handler.service';
+import { GlobalErrorHandler } from './core/handlers/global-error.handler';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
 import { loadingInterceptor } from './core/interceptors/loading.interceptor';

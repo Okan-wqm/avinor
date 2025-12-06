@@ -155,6 +155,38 @@ export const APP_ROUTES: Routes = [
     ],
   },
 
-  // 404 - Redirect to dashboard
-  { path: '**', redirectTo: 'dashboard' },
+  // =========================================================================
+  // ERROR PAGES (No layout)
+  // =========================================================================
+  {
+    path: 'error',
+    children: [
+      {
+        path: '404',
+        loadComponent: () =>
+          import('./features/errors/not-found.component').then(
+            (m) => m.NotFoundComponent
+          ),
+        title: 'Page Not Found',
+      },
+      {
+        path: '500',
+        loadComponent: () =>
+          import('./features/errors/server-error.component').then(
+            (m) => m.ServerErrorComponent
+          ),
+        title: 'Server Error',
+      },
+    ],
+  },
+
+  // 404 - Show Not Found page
+  {
+    path: '**',
+    loadComponent: () =>
+      import('./features/errors/not-found.component').then(
+        (m) => m.NotFoundComponent
+      ),
+    title: 'Page Not Found',
+  },
 ];

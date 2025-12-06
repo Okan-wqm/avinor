@@ -8,12 +8,14 @@ import {
   DestroyRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router, NavigationStart, NavigationEnd } from '@angular/router';
+import { RouterModule, Router, NavigationStart, NavigationEnd, RouterOutlet, ChildrenOutletContexts } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { HeaderComponent } from './header/header.component';
+import { scaleFadeAnimation } from '../shared/animations';
 import { SidebarComponent } from './sidebar/sidebar.component';
 import { SkipLinkComponent } from './skip-link.component';
+import { ToastContainerComponent } from '../shared/components/toast';
 import { AuthStore } from '../core/services/auth.store';
 import { ThemeService } from '../core/services/theme.service';
 
@@ -29,8 +31,9 @@ export interface MenuItem {
 @Component({
   selector: 'fts-main-layout',
   standalone: true,
-  imports: [CommonModule, RouterModule, HeaderComponent, SidebarComponent, SkipLinkComponent],
+  imports: [CommonModule, RouterModule, HeaderComponent, SidebarComponent, SkipLinkComponent, ToastContainerComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  animations: [scaleFadeAnimation],
   template: `
     <!-- Skip to main content link for keyboard users (WCAG 2.1 AA) -->
     <fts-skip-link />
@@ -71,7 +74,9 @@ export interface MenuItem {
           aria-label="Main content"
           tabindex="-1"
         >
-          <router-outlet />
+          <div [@routeAnimations]="getRouteAnimationData()">
+            <router-outlet />
+          </div>
         </main>
 
         <!-- Footer - Contentinfo landmark -->
@@ -88,6 +93,9 @@ export interface MenuItem {
         </footer>
       </div>
     </div>
+
+    <!-- Toast Notifications -->
+    <fts-toast-container />
   `,
 })
 export class MainLayoutComponent implements OnInit {
@@ -95,6 +103,7 @@ export class MainLayoutComponent implements OnInit {
   private router = inject(Router);
   private themeService = inject(ThemeService);
   private destroyRef = inject(DestroyRef);
+  private contexts = inject(ChildrenOutletContexts);
 
   // State
   sidebarCollapsed = signal(false);
@@ -188,5 +197,9 @@ export class MainLayoutComponent implements OnInit {
   onLogout() {
     this.authStore.logout();
     this.router.navigate(['/auth/login']);
+  }
+
+  getRouteAnimationData() {
+    return this.contexts.getContext('primary')?.route?.snapshot?.url.join('/') ?? '';
   }
 }
