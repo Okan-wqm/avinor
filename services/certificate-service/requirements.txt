@@ -28,6 +28,9 @@ django-redis>=5.4.0
 # Task Queue
 celery>=5.3.0
 
+# Message Broker
+nats-py>=2.6.0  # NATS with JetStream
+
 # Monitoring
 sentry-sdk>=1.38.0
 

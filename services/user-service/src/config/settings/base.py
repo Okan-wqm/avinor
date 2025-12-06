@@ -212,7 +212,8 @@ SESSION_CACHE_ALIAS = 'session'
 # CELERY CONFIGURATION
 # =============================================================================
 
-CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'amqp://guest:guest@localhost:5672//')
+# Using Redis as Celery broker (NATS is used for inter-service events)
+CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', REDIS_URL)
 CELERY_RESULT_BACKEND = 'django-db'
 CELERY_CACHE_BACKEND = 'default'
 CELERY_ACCEPT_CONTENT = ['json']
@@ -389,20 +390,23 @@ SERVICE_URLS = {
 SERVICE_AUTH_TOKEN = os.environ.get('SERVICE_AUTH_TOKEN', 'service-auth-token')
 
 # =============================================================================
-# EVENT BUS (RabbitMQ)
+# NATS CONFIGURATION (Message Broker)
 # =============================================================================
 
-RABBITMQ_HOST = os.environ.get('RABBITMQ_HOST', 'localhost')
-RABBITMQ_PORT = int(os.environ.get('RABBITMQ_PORT', 5672))
-RABBITMQ_USER = os.environ.get('RABBITMQ_USER', 'guest')
-RABBITMQ_PASSWORD = os.environ.get('RABBITMQ_PASSWORD', 'guest')
-RABBITMQ_VHOST = os.environ.get('RABBITMQ_VHOST', '/')
+# NATS connection settings
+NATS_SERVERS = os.environ.get('NATS_SERVERS', 'nats://localhost:4222').split(',')
+NATS_USER = os.environ.get('NATS_USER', None)
+NATS_PASSWORD = os.environ.get('NATS_PASSWORD', None)
+NATS_TOKEN = os.environ.get('NATS_TOKEN', None)
 
-EVENT_BUS = {
-    'BROKER_URL': os.environ.get('RABBITMQ_URL', f'amqp://{RABBITMQ_USER}:{RABBITMQ_PASSWORD}@{RABBITMQ_HOST}:{RABBITMQ_PORT}/{RABBITMQ_VHOST}'),
-    'EXCHANGE_NAME': 'flight_training_events',
-    'EXCHANGE_TYPE': 'topic',
-}
+# NATS connection options
+NATS_CONNECT_TIMEOUT = int(os.environ.get('NATS_CONNECT_TIMEOUT', 10))
+NATS_RECONNECT_TIME_WAIT = int(os.environ.get('NATS_RECONNECT_TIME_WAIT', 2))
+NATS_MAX_RECONNECT_ATTEMPTS = int(os.environ.get('NATS_MAX_RECONNECT_ATTEMPTS', 60))
+
+# JetStream settings (for persistent messaging)
+NATS_STREAM_NAME = os.environ.get('NATS_STREAM_NAME', 'FTMS_EVENTS')
+NATS_STREAM_SUBJECTS = os.environ.get('NATS_STREAM_SUBJECTS', 'ftms.>').split(',')
 
 # =============================================================================
 # FILE STORAGE (MinIO/S3)

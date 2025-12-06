@@ -144,13 +144,25 @@ CACHES = {
     }
 }
 
-# Celery
-CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'amqp://admin:admin_password@rabbitmq:5672//')
+# Celery (using Redis as broker - NATS is used for inter-service events)
+REDIS_URL = os.environ.get('REDIS_URL', 'redis://redis:6379/2')
+CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', REDIS_URL)
 CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', 'redis://redis:6379/3')
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
+
+# NATS Configuration (Message Broker for inter-service events)
+NATS_SERVERS = os.environ.get('NATS_SERVERS', 'nats://localhost:4222').split(',')
+NATS_USER = os.environ.get('NATS_USER', None)
+NATS_PASSWORD = os.environ.get('NATS_PASSWORD', None)
+NATS_TOKEN = os.environ.get('NATS_TOKEN', None)
+NATS_CONNECT_TIMEOUT = int(os.environ.get('NATS_CONNECT_TIMEOUT', 10))
+NATS_RECONNECT_TIME_WAIT = int(os.environ.get('NATS_RECONNECT_TIME_WAIT', 2))
+NATS_MAX_RECONNECT_ATTEMPTS = int(os.environ.get('NATS_MAX_RECONNECT_ATTEMPTS', 60))
+NATS_STREAM_NAME = os.environ.get('NATS_STREAM_NAME', 'FTMS_EVENTS')
+NATS_STREAM_SUBJECTS = os.environ.get('NATS_STREAM_SUBJECTS', 'ftms.>').split(',')
 
 # JWT Settings
 JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY', SECRET_KEY)

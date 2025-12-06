@@ -19,6 +19,9 @@ redis>=5.0.1
 django-celery-beat>=2.5.0
 django-celery-results>=2.5.1
 
+# Message Broker
+nats-py>=2.6.0  # NATS with JetStream
+
 # Payment Gateways
 stripe>=7.0.0
 

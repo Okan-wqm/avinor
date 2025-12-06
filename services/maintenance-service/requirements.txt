@@ -37,8 +37,9 @@ pytz>=2023.3
 # Monitoring
 sentry-sdk>=1.29.0
 
-# Message Queue (optional)
+# Message Queue
 redis>=4.6.0
+nats-py>=2.6.0  # NATS with JetStream
 
 # Environment
 python-dotenv>=1.0.0

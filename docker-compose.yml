@@ -107,28 +107,49 @@ services:
       - ftms-network
     restart: unless-stopped
 
-  # RabbitMQ Message Broker
-  rabbitmq:
-    image: rabbitmq:3.12-management-alpine
-    container_name: ftms-rabbitmq
-    environment:
-      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-admin}
-      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-admin_password}
+  # NATS Message Broker with JetStream
+  nats:
+    image: nats:2.10-alpine
+    container_name: ftms-nats
+    command:
+      - "--name=ftms-nats"
+      - "--jetstream"
+      - "--store_dir=/data"
+      - "--http_port=8222"
+      - "--port=4222"
+      - "--user=${NATS_USER:-admin}"
+      - "--pass=${NATS_PASSWORD:-nats_password}"
+      - "--max_payload=1MB"
+      - "--max_connections=1000"
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - "4222:4222"   # Client connections
+      - "8222:8222"   # HTTP monitoring
+      - "6222:6222"   # Cluster routing (for future clustering)
     volumes:
-      - rabbitmq_data:/var/lib/rabbitmq
-      - ./infrastructure/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
-      - ./infrastructure/rabbitmq/definitions.json:/etc/rabbitmq/definitions.json
+      - nats_data:/data
     healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "check_running"]
-      interval: 30s
-      timeout: 10s
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8222/healthz"]
+      interval: 10s
+      timeout: 5s
       retries: 5
     networks:
       - ftms-network
     restart: unless-stopped
+
+  # NATS Box (CLI tools for debugging - development only)
+  nats-box:
+    image: natsio/nats-box:latest
+    container_name: ftms-nats-box
+    profiles:
+      - dev
+    environment:
+      - NATS_URL=nats://admin:nats_password@nats:4222
+    networks:
+      - ftms-network
+    command: ["tail", "-f", "/dev/null"]
+    depends_on:
+      nats:
+        condition: service_healthy
 
   # MinIO Object Storage
   minio:
@@ -233,9 +254,9 @@ services:
       - DB_USER=user_service
       - DB_PASSWORD=${USER_SERVICE_DB_PASSWORD:-user_service_password_change_me}
       - REDIS_URL=redis://redis:6379/0
-      - RABBITMQ_HOST=rabbitmq
-      - RABBITMQ_USER=${RABBITMQ_USER:-admin}
-      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD:-admin_password}
+      - NATS_SERVERS=nats://nats:4222
+      - NATS_USER=${NATS_USER:-admin}
+      - NATS_PASSWORD=${NATS_PASSWORD:-nats_password}
       - MINIO_ENDPOINT=http://minio:9000
       - MINIO_ACCESS_KEY=${MINIO_ROOT_USER:-minioadmin}
       - MINIO_SECRET_KEY=${MINIO_ROOT_PASSWORD:-minioadmin}
@@ -248,7 +269,7 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-      rabbitmq:
+      nats:
         condition: service_healthy
     volumes:
       - ./services/user-service/src:/app
@@ -271,7 +292,9 @@ services:
       - DB_USER=org_service
       - DB_PASSWORD=${ORG_SERVICE_DB_PASSWORD:-org_service_password_change_me}
       - REDIS_URL=redis://redis:6379/0
-      - RABBITMQ_HOST=rabbitmq
+      - NATS_SERVERS=nats://nats:4222
+      - NATS_USER=${NATS_USER:-admin}
+      - NATS_PASSWORD=${NATS_PASSWORD:-nats_password}
       - SERVICE_NAME=organization-service
       - SERVICE_PORT=8002
     ports:
@@ -280,6 +303,8 @@ services:
       postgres-primary:
         condition: service_healthy
       redis:
+        condition: service_healthy
+      nats:
         condition: service_healthy
     networks:
       - ftms-network
@@ -299,7 +324,9 @@ services:
       - DB_USER=aircraft_service
       - DB_PASSWORD=${AIRCRAFT_SERVICE_DB_PASSWORD:-aircraft_service_password_change_me}
       - REDIS_URL=redis://redis:6379/0
-      - RABBITMQ_HOST=rabbitmq
+      - NATS_SERVERS=nats://nats:4222
+      - NATS_USER=${NATS_USER:-admin}
+      - NATS_PASSWORD=${NATS_PASSWORD:-nats_password}
       - SERVICE_NAME=aircraft-service
       - SERVICE_PORT=8003
     ports:
@@ -308,6 +335,8 @@ services:
       postgres-primary:
         condition: service_healthy
       redis:
+        condition: service_healthy
+      nats:
         condition: service_healthy
     networks:
       - ftms-network
@@ -327,7 +356,9 @@ services:
       - DB_USER=booking_service
       - DB_PASSWORD=${BOOKING_SERVICE_DB_PASSWORD:-booking_service_password_change_me}
       - REDIS_URL=redis://redis:6379/0
-      - RABBITMQ_HOST=rabbitmq
+      - NATS_SERVERS=nats://nats:4222
+      - NATS_USER=${NATS_USER:-admin}
+      - NATS_PASSWORD=${NATS_PASSWORD:-nats_password}
       - SERVICE_NAME=booking-service
       - SERVICE_PORT=8005
     ports:
@@ -336,6 +367,8 @@ services:
       postgres-primary:
         condition: service_healthy
       redis:
+        condition: service_healthy
+      nats:
         condition: service_healthy
     networks:
       - ftms-network
@@ -355,7 +388,9 @@ services:
       - DB_USER=flight_service
       - DB_PASSWORD=${FLIGHT_SERVICE_DB_PASSWORD:-flight_service_password_change_me}
       - REDIS_URL=redis://redis:6379/0
-      - RABBITMQ_HOST=rabbitmq
+      - NATS_SERVERS=nats://nats:4222
+      - NATS_USER=${NATS_USER:-admin}
+      - NATS_PASSWORD=${NATS_PASSWORD:-nats_password}
       - SERVICE_NAME=flight-service
       - SERVICE_PORT=8006
     ports:
@@ -364,6 +399,8 @@ services:
       postgres-primary:
         condition: service_healthy
       redis:
+        condition: service_healthy
+      nats:
         condition: service_healthy
     networks:
       - ftms-network
@@ -383,7 +420,9 @@ services:
       - DB_USER=training_service
       - DB_PASSWORD=${TRAINING_SERVICE_DB_PASSWORD:-training_service_password_change_me}
       - REDIS_URL=redis://redis:6379/0
-      - RABBITMQ_HOST=rabbitmq
+      - NATS_SERVERS=nats://nats:4222
+      - NATS_USER=${NATS_USER:-admin}
+      - NATS_PASSWORD=${NATS_PASSWORD:-nats_password}
       - SERVICE_NAME=training-service
       - SERVICE_PORT=8007
     ports:
@@ -392,6 +431,8 @@ services:
       postgres-primary:
         condition: service_healthy
       redis:
+        condition: service_healthy
+      nats:
         condition: service_healthy
     networks:
       - ftms-network
@@ -411,7 +452,9 @@ services:
       - DB_USER=notif_service
       - DB_PASSWORD=${NOTIF_SERVICE_DB_PASSWORD:-notif_service_password_change_me}
       - REDIS_URL=redis://redis:6379/0
-      - RABBITMQ_HOST=rabbitmq
+      - NATS_SERVERS=nats://nats:4222
+      - NATS_USER=${NATS_USER:-admin}
+      - NATS_PASSWORD=${NATS_PASSWORD:-nats_password}
       - SERVICE_NAME=notification-service
       - SERVICE_PORT=8013
     ports:
@@ -421,7 +464,7 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-      rabbitmq:
+      nats:
         condition: service_healthy
     networks:
       - ftms-network
@@ -565,7 +608,7 @@ volumes:
   redis_data_1:
   redis_data_2:
   redis_data_3:
-  rabbitmq_data:
+  nats_data:
   minio_data:
   prometheus_data:
   grafana_data:

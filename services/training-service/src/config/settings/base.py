@@ -66,7 +66,15 @@ REST_FRAMEWORK = {
 }
 
 CORS_ALLOW_ALL_ORIGINS = DEBUG
-CACHES = {'default': {'BACKEND': 'django_redis.cache.RedisCache', 'LOCATION': os.environ.get('REDIS_URL', 'redis://redis:6379/6')}}
+REDIS_URL = os.environ.get('REDIS_URL', 'redis://redis:6379/6')
+CACHES = {'default': {'BACKEND': 'django_redis.cache.RedisCache', 'LOCATION': REDIS_URL}}
+
+# NATS Configuration
+NATS_SERVERS = os.environ.get('NATS_SERVERS', 'nats://localhost:4222').split(',')
+NATS_USER = os.environ.get('NATS_USER', None)
+NATS_PASSWORD = os.environ.get('NATS_PASSWORD', None)
+NATS_STREAM_NAME = os.environ.get('NATS_STREAM_NAME', 'FTMS_EVENTS')
+
 JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY', SECRET_KEY)
 SERVICE_NAME = 'training-service'
 SERVICE_PORT = 8007

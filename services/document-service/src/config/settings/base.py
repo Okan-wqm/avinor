@@ -136,8 +136,15 @@ CACHES = {
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 SESSION_CACHE_ALIAS = 'default'
 
-CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'amqp://guest:guest@localhost:5672//')
+# Celery (using Redis as broker)
+CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', REDIS_URL)
 CELERY_RESULT_BACKEND = 'django-db'
+
+# NATS Configuration
+NATS_SERVERS = os.environ.get('NATS_SERVERS', 'nats://localhost:4222').split(',')
+NATS_USER = os.environ.get('NATS_USER', None)
+NATS_PASSWORD = os.environ.get('NATS_PASSWORD', None)
+NATS_STREAM_NAME = os.environ.get('NATS_STREAM_NAME', 'FTMS_EVENTS')
 CELERY_CACHE_BACKEND = 'default'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'

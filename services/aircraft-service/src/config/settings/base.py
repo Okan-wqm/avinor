@@ -118,8 +118,15 @@ CACHES = {
     }
 }
 
-CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'amqp://admin:admin_password@rabbitmq:5672//')
+# Celery (using Redis as broker - NATS is used for inter-service events)
+CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', os.environ.get('REDIS_URL', 'redis://redis:6379/3'))
 CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', 'redis://redis:6379/3')
+
+# NATS Configuration
+NATS_SERVERS = os.environ.get('NATS_SERVERS', 'nats://localhost:4222').split(',')
+NATS_USER = os.environ.get('NATS_USER', None)
+NATS_PASSWORD = os.environ.get('NATS_PASSWORD', None)
+NATS_STREAM_NAME = os.environ.get('NATS_STREAM_NAME', 'FTMS_EVENTS')
 
 JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY', SECRET_KEY)
 JWT_ALGORITHM = 'HS256'
