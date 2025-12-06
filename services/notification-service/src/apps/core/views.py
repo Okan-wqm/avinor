@@ -72,7 +72,11 @@ class NotificationViewSet(viewsets.ModelViewSet):
             status=Notification.Status.PENDING
         )
 
-        # TODO: Queue for sending via Celery
+        # Queue for sending via Celery
+        from .tasks import send_notification
+        if not notification.scheduled_at:
+            # Send immediately if not scheduled
+            send_notification.delay(str(notification.id))
 
         return Response(NotificationSerializer(notification).data, status=status.HTTP_201_CREATED)
 

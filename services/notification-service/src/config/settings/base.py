@@ -69,6 +69,26 @@ CORS_ALLOW_ALL_ORIGINS = DEBUG
 REDIS_URL = os.environ.get('REDIS_URL', 'redis://redis:6379/7')
 CACHES = {'default': {'BACKEND': 'django_redis.cache.RedisCache', 'LOCATION': REDIS_URL}}
 CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', REDIS_URL)
+CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', REDIS_URL)
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 300  # 5 minutes
+
+# Celery Beat Schedule for periodic tasks
+from celery.schedules import crontab
+CELERY_BEAT_SCHEDULE = {
+    'process-scheduled-notifications': {
+        'task': 'apps.core.tasks.process_scheduled_notifications',
+        'schedule': crontab(minute='*/5'),  # Every 5 minutes
+    },
+    'retry-failed-notifications': {
+        'task': 'apps.core.tasks.retry_failed_notifications',
+        'schedule': crontab(minute='*/15'),  # Every 15 minutes
+    },
+}
 
 # NATS Configuration
 NATS_SERVERS = os.environ.get('NATS_SERVERS', 'nats://localhost:4222').split(',')
