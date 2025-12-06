@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { loadRemoteModule } from '@angular-architects/module-federation';
 import { environment } from '../environments/environment';
+import { authGuard, roleGuard } from './core/guards';
 
 // MFE Configuration with error handling
 interface MfeConfig {
@@ -87,7 +88,7 @@ export const APP_ROUTES: Routes = [
       import('./layout/main-layout.component').then(
         (m) => m.MainLayoutComponent
       ),
-    canActivate: [], // TODO: Add AuthGuard
+    canActivate: [authGuard],
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
 
@@ -138,6 +139,7 @@ export const APP_ROUTES: Routes = [
       {
         path: 'admin',
         loadChildren: loadMfe(MFE_CONFIG.admin),
+        canActivate: [roleGuard],
         data: { mfe: 'admin', roles: ['admin', 'super_admin'] },
       },
 

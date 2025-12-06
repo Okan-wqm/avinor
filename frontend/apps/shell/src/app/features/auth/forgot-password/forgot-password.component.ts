@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -7,6 +7,7 @@ import { RouterModule } from '@angular/router';
   selector: 'fts-forgot-password',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div
       class="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4"

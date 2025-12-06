@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ThemeService } from '../../core/services/theme.service';
 import { AuthStore } from '../../core/services/auth.store';
@@ -7,6 +7,7 @@ import { AuthStore } from '../../core/services/auth.store';
   selector: 'fts-settings',
   standalone: true,
   imports: [CommonModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="max-w-2xl space-y-6">
       <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Settings</h1>

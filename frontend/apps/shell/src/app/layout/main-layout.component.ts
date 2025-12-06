@@ -4,14 +4,16 @@ import {
   computed,
   inject,
   OnInit,
-  OnDestroy,
+  ChangeDetectionStrategy,
+  DestroyRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, NavigationStart, NavigationEnd } from '@angular/router';
-import { Subject, takeUntil } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { HeaderComponent } from './header/header.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
+import { SkipLinkComponent } from './skip-link.component';
 import { AuthStore } from '../core/services/auth.store';
 import { ThemeService } from '../core/services/theme.service';
 
@@ -27,17 +29,23 @@ export interface MenuItem {
 @Component({
   selector: 'fts-main-layout',
   standalone: true,
-  imports: [CommonModule, RouterModule, HeaderComponent, SidebarComponent],
+  imports: [CommonModule, RouterModule, HeaderComponent, SidebarComponent, SkipLinkComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
+    <!-- Skip to main content link for keyboard users (WCAG 2.1 AA) -->
+    <fts-skip-link />
+
     <div class="flex h-screen overflow-hidden" [class.dark]="isDarkMode()">
-      <!-- Loading Bar -->
+      <!-- Loading Bar - hidden from screen readers -->
       @if (isNavigating()) {
         <div
           class="fixed top-0 left-0 right-0 h-1 bg-primary-500 z-50 animate-pulse"
+          aria-hidden="true"
+          role="presentation"
         ></div>
       }
 
-      <!-- Sidebar -->
+      <!-- Sidebar Navigation -->
       <fts-sidebar
         [collapsed]="sidebarCollapsed()"
         [menuItems]="menuItems()"
@@ -55,16 +63,21 @@ export interface MenuItem {
           (logout)="onLogout()"
         />
 
-        <!-- Page Content -->
+        <!-- Page Content - Main landmark for accessibility -->
         <main
+          id="main-content"
           class="flex-1 overflow-auto bg-gray-50 dark:bg-gray-900 p-4 lg:p-6"
+          role="main"
+          aria-label="Main content"
+          tabindex="-1"
         >
           <router-outlet />
         </main>
 
-        <!-- Footer -->
+        <!-- Footer - Contentinfo landmark -->
         <footer
           class="px-4 lg:px-6 py-3 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700"
+          role="contentinfo"
         >
           <div
             class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400"
@@ -77,11 +90,11 @@ export interface MenuItem {
     </div>
   `,
 })
-export class MainLayoutComponent implements OnInit, OnDestroy {
+export class MainLayoutComponent implements OnInit {
   protected authStore = inject(AuthStore);
   private router = inject(Router);
   private themeService = inject(ThemeService);
-  private destroy$ = new Subject<void>();
+  private destroyRef = inject(DestroyRef);
 
   // State
   sidebarCollapsed = signal(false);
@@ -155,20 +168,17 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
   });
 
   ngOnInit() {
-    // Track navigation for loading state
-    this.router.events.pipe(takeUntil(this.destroy$)).subscribe((event) => {
-      if (event instanceof NavigationStart) {
-        this.isNavigating.set(true);
-      }
-      if (event instanceof NavigationEnd) {
-        this.isNavigating.set(false);
-      }
-    });
-  }
-
-  ngOnDestroy() {
-    this.destroy$.next();
-    this.destroy$.complete();
+    // Track navigation for loading state (auto-cleanup with takeUntilDestroyed)
+    this.router.events
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((event) => {
+        if (event instanceof NavigationStart) {
+          this.isNavigating.set(true);
+        }
+        if (event instanceof NavigationEnd) {
+          this.isNavigating.set(false);
+        }
+      });
   }
 
   toggleSidebar() {

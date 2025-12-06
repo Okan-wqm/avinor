@@ -1,13 +1,14 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { AuthStore } from '../../../core/services/auth.store';
 
 @Component({
   selector: 'fts-login',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div
       class="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4"
@@ -19,12 +20,14 @@ import { AuthStore } from '../../../core/services/auth.store';
         <div class="text-center mb-8">
           <div
             class="inline-flex items-center justify-center w-16 h-16 bg-primary-100 dark:bg-primary-900 rounded-full mb-4"
+            aria-hidden="true"
           >
             <svg
               class="w-10 h-10 text-primary-600 dark:text-primary-400"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
+              aria-hidden="true"
             >
               <path
                 stroke-linecap="round"
@@ -34,7 +37,7 @@ import { AuthStore } from '../../../core/services/auth.store';
               />
             </svg>
           </div>
-          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-white" id="login-heading">
             Flight Training System
           </h1>
           <p class="text-gray-500 dark:text-gray-400 mt-2">
@@ -42,19 +45,29 @@ import { AuthStore } from '../../../core/services/auth.store';
           </p>
         </div>
 
-        <!-- Error Message -->
-        @if (authStore.error()) {
-          <div
-            class="mb-4 p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg"
-          >
-            <p class="text-sm text-red-600 dark:text-red-400">
-              {{ authStore.error() }}
-            </p>
-          </div>
-        }
+        <!-- Error Message - Live region for screen readers -->
+        <div
+          role="alert"
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          @if (authStore.error()) {
+            <div
+              class="mb-4 p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg"
+            >
+              <p class="text-sm text-red-600 dark:text-red-400">
+                {{ authStore.error() }}
+              </p>
+            </div>
+          }
+        </div>
 
         <!-- Login Form -->
-        <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+        <form
+          (ngSubmit)="onSubmit()"
+          #loginForm="ngForm"
+          aria-labelledby="login-heading"
+        >
           <!-- Email -->
           <div class="mb-4">
             <label
@@ -62,6 +75,7 @@ import { AuthStore } from '../../../core/services/auth.store';
               class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
             >
               Email
+              <span class="sr-only">(required)</span>
             </label>
             <input
               type="email"
@@ -69,9 +83,13 @@ import { AuthStore } from '../../../core/services/auth.store';
               name="email"
               [(ngModel)]="email"
               required
+              autocomplete="email"
+              aria-required="true"
+              aria-describedby="email-hint"
               class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               placeholder="you@example.com"
             />
+            <span id="email-hint" class="sr-only">Enter your email address</span>
           </div>
 
           <!-- Password -->
@@ -82,10 +100,11 @@ import { AuthStore } from '../../../core/services/auth.store';
                 class="block text-sm font-medium text-gray-700 dark:text-gray-300"
               >
                 Password
+                <span class="sr-only">(required)</span>
               </label>
               <a
                 routerLink="/auth/forgot-password"
-                class="text-sm text-primary-600 hover:text-primary-700"
+                class="text-sm text-primary-600 hover:text-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 rounded"
               >
                 Forgot password?
               </a>
@@ -96,6 +115,8 @@ import { AuthStore } from '../../../core/services/auth.store';
               name="password"
               [(ngModel)]="password"
               required
+              autocomplete="current-password"
+              aria-required="true"
               class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               placeholder="Enter your password"
             />
@@ -122,13 +143,16 @@ import { AuthStore } from '../../../core/services/auth.store';
           <button
             type="submit"
             [disabled]="authStore.isLoading() || !loginForm.valid"
-            class="w-full py-2.5 px-4 bg-primary-600 hover:bg-primary-700 disabled:bg-primary-400 text-white font-medium rounded-lg transition-colors flex items-center justify-center"
+            [attr.aria-busy]="authStore.isLoading()"
+            [attr.aria-disabled]="authStore.isLoading() || !loginForm.valid"
+            class="w-full py-2.5 px-4 bg-primary-600 hover:bg-primary-700 disabled:bg-primary-400 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
           >
             @if (authStore.isLoading()) {
               <svg
                 class="animate-spin -ml-1 mr-2 h-5 w-5"
                 fill="none"
                 viewBox="0 0 24 24"
+                aria-hidden="true"
               >
                 <circle
                   class="opacity-25"
@@ -144,7 +168,8 @@ import { AuthStore } from '../../../core/services/auth.store';
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                 ></path>
               </svg>
-              Signing in...
+              <span>Signing in...</span>
+              <span class="sr-only">Please wait while signing in</span>
             } @else {
               Sign in
             }
@@ -162,18 +187,26 @@ import { AuthStore } from '../../../core/services/auth.store';
     </div>
   `,
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   protected authStore = inject(AuthStore);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   email = '';
   password = '';
   rememberMe = false;
+  private returnUrl = '/dashboard';
 
-  async onSubmit() {
-    const success = await this.authStore.login(this.email, this.password);
+  ngOnInit(): void {
+    // Get return URL from query params (set by auth guard)
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
+  }
+
+  async onSubmit(): Promise<void> {
+    const success = await this.authStore.login(this.email, this.password, this.rememberMe);
     if (success) {
-      this.router.navigate(['/dashboard']);
+      // Navigate to the originally requested URL or dashboard
+      this.router.navigateByUrl(this.returnUrl);
     }
   }
 }

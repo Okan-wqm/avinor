@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
@@ -6,6 +6,7 @@ import { RouterModule } from '@angular/router';
   selector: 'fts-mfe-error',
   standalone: true,
   imports: [CommonModule, RouterModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div
       class="flex flex-col items-center justify-center min-h-[400px] p-8 text-center"
