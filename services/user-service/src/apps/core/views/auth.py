@@ -260,7 +260,7 @@ class AuthViewSet(viewsets.ViewSet):
 
         try:
             result = self.auth_service.refresh_tokens(
-                refresh_token=serializer.validated_data['refresh_token']
+                refresh_token=serializer.validated_data['refresh']
             )
 
             return Response({
@@ -281,7 +281,7 @@ class AuthViewSet(viewsets.ViewSet):
 
         self.auth_service.logout(
             user=request.user,
-            refresh_token=serializer.validated_data.get('refresh_token'),
+            refresh_token=serializer.validated_data.get('refresh'),
             session_id=getattr(request, 'session_id', None),
             logout_all=serializer.validated_data.get('logout_all', False)
         )

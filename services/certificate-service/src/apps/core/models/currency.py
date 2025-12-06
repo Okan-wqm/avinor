@@ -14,6 +14,15 @@ from django.contrib.postgres.fields import ArrayField
 from django.utils import timezone
 
 
+class CurrencyStatus(models.TextChoices):
+    """Currency status choices."""
+    CURRENT = 'current', 'Current'
+    WARNING = 'warning', 'Warning (Expiring Soon)'
+    EXPIRED = 'expired', 'Expired'
+    NOT_CURRENT = 'not_current', 'Not Current'
+    GRACE_PERIOD = 'grace_period', 'Grace Period'
+
+
 class CurrencyType(models.TextChoices):
     """Currency requirement type choices."""
     # Basic Currency
@@ -264,6 +273,12 @@ class UserCurrencyStatus(models.Model):
     )
 
     # Status
+    status = models.CharField(
+        max_length=20,
+        choices=CurrencyStatus.choices,
+        default=CurrencyStatus.NOT_CURRENT,
+        db_index=True
+    )
     is_current = models.BooleanField(default=False, db_index=True)
     is_warning = models.BooleanField(
         default=False,

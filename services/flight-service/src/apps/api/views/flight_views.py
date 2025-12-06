@@ -340,6 +340,71 @@ class FlightViewSet(BaseFlightViewSet, PaginationMixin, FilterMixin):
         response_serializer = FlightDetailSerializer(flight)
         return Response(response_serializer.data)
 
+    @action(detail=True, methods=['post'])
+    def start(self, request, pk=None):
+        """
+        Start a flight - marks the flight as in progress.
+
+        POST /api/v1/flights/{id}/start/
+
+        Updates flight status to 'in_progress' and records actual departure time.
+        """
+        organization_id = self.get_organization_id()
+        user_id = self.get_user_id()
+        flight_id = UUID(pk)
+
+        try:
+            flight = FlightService.start_flight(
+                flight_id=flight_id,
+                organization_id=organization_id,
+                started_by=user_id,
+                hobbs_start=request.data.get('hobbs_start'),
+                tach_start=request.data.get('tach_start'),
+                actual_departure=request.data.get('actual_departure'),
+            )
+
+            response_serializer = FlightDetailSerializer(flight)
+            return Response(response_serializer.data)
+        except FlightValidationError as e:
+            return Response(
+                {'error': str(e), 'field': getattr(e, 'field', None)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+    @action(detail=True, methods=['post'])
+    def complete(self, request, pk=None):
+        """
+        Complete a flight - marks the flight as completed.
+
+        POST /api/v1/flights/{id}/complete/
+
+        Updates flight status to 'completed' and records actual arrival time,
+        ending Hobbs/Tach readings, and final flight time calculations.
+        """
+        organization_id = self.get_organization_id()
+        user_id = self.get_user_id()
+        flight_id = UUID(pk)
+
+        try:
+            flight = FlightService.complete_flight(
+                flight_id=flight_id,
+                organization_id=organization_id,
+                completed_by=user_id,
+                hobbs_end=request.data.get('hobbs_end'),
+                tach_end=request.data.get('tach_end'),
+                actual_arrival=request.data.get('actual_arrival'),
+                fuel_used=request.data.get('fuel_used'),
+                remarks=request.data.get('remarks'),
+            )
+
+            response_serializer = FlightDetailSerializer(flight)
+            return Response(response_serializer.data)
+        except FlightValidationError as e:
+            return Response(
+                {'error': str(e), 'field': getattr(e, 'field', None)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
     # ==========================================================================
     # Signatures
     # ==========================================================================

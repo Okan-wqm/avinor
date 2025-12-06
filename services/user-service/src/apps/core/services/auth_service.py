@@ -506,8 +506,8 @@ class AuthService:
         logger.info(f"User logged in: {user.email}")
 
         return {
-            'access_token': tokens['access_token'],
-            'refresh_token': tokens['refresh_token'],
+            'access': tokens['access_token'],
+            'refresh': tokens['refresh_token'],
             'token_type': 'Bearer',
             'expires_in': tokens['expires_in'],
             'user': self._serialize_user(user),
@@ -556,8 +556,8 @@ class AuthService:
         )
 
         return {
-            'access_token': tokens['access_token'],
-            'refresh_token': refresh_token,  # Return same refresh token
+            'access': tokens['access_token'],
+            'refresh': refresh_token,  # Return same refresh token
             'token_type': 'Bearer',
             'expires_in': tokens['expires_in']
         }

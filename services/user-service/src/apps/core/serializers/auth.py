@@ -54,13 +54,14 @@ class TwoFactorVerifySerializer(serializers.Serializer):
 class TokenResponseSerializer(serializers.Serializer):
     """
     Serializer for authentication token response.
+    Compatible with frontend expectations (access/refresh field names).
     """
 
-    access_token = serializers.CharField()
-    refresh_token = serializers.CharField()
+    access = serializers.CharField(help_text="JWT access token")
+    refresh = serializers.CharField(help_text="JWT refresh token")
     token_type = serializers.CharField(default='Bearer')
-    expires_in = serializers.IntegerField()
-    user = serializers.DictField()
+    expires_in = serializers.IntegerField(help_text="Token expiry time in seconds")
+    user = serializers.DictField(help_text="User details")
     session_id = serializers.UUIDField(required=False)
 
 
@@ -79,17 +80,19 @@ class TwoFactorRequiredResponseSerializer(serializers.Serializer):
 class RefreshTokenSerializer(serializers.Serializer):
     """
     Serializer for token refresh request.
+    Compatible with frontend expectations.
     """
 
-    refresh_token = serializers.CharField(required=True)
+    refresh = serializers.CharField(required=True, help_text="JWT refresh token")
 
 
 class LogoutSerializer(serializers.Serializer):
     """
     Serializer for logout request.
+    Compatible with frontend expectations.
     """
 
-    refresh_token = serializers.CharField(required=False)
+    refresh = serializers.CharField(required=False, help_text="JWT refresh token to revoke")
     logout_all = serializers.BooleanField(default=False)
 
 

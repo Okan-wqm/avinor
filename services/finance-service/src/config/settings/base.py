@@ -86,8 +86,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.environ.get('DB_NAME', 'finance_service_db'),
-        'USER': os.environ.get('DB_USER', 'certificate_service'),
-        'PASSWORD': os.environ.get('DB_PASSWORD', 'certificate_service_password'),
+        'USER': os.environ.get('DB_USER', 'finance_service'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', 'finance_service_password'),
         'HOST': os.environ.get('DB_HOST', 'localhost'),
         'PORT': os.environ.get('DB_PORT', '5432'),
         'CONN_MAX_AGE': 60,

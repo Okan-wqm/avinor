@@ -32,6 +32,7 @@ from .currency import (
     CurrencyRequirement,
     UserCurrencyStatus,
     CurrencyType,
+    CurrencyStatus,
 )
 from .verification import (
     CertificateVerification,
@@ -63,6 +64,7 @@ __all__ = [
     'CurrencyRequirement',
     'UserCurrencyStatus',
     'CurrencyType',
+    'CurrencyStatus',
     # Verification
     'CertificateVerification',
     'VerificationMethod',

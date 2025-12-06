@@ -64,7 +64,11 @@ class Flight(models.Model):
 
     class Status(models.TextChoices):
         DRAFT = 'draft', 'Draft'
-        SUBMITTED = 'submitted', 'Submitted'
+        PLANNED = 'planned', 'Planned'
+        SCHEDULED = 'scheduled', 'Scheduled'
+        IN_PROGRESS = 'in_progress', 'In Progress'
+        COMPLETED = 'completed', 'Completed'
+        SUBMITTED = 'submitted', 'Submitted for Review'
         PENDING_REVIEW = 'pending_review', 'Pending Review'
         APPROVED = 'approved', 'Approved'
         REJECTED = 'rejected', 'Rejected'
@@ -580,6 +584,20 @@ class Flight(models.Model):
     # Metadata
     # ==========================================================================
     metadata = models.JSONField(default=dict, blank=True)
+
+    # ==========================================================================
+    # Flight State Tracking
+    # ==========================================================================
+    started_at = models.DateTimeField(blank=True, null=True)
+    started_by = models.UUIDField(blank=True, null=True)
+    completed_at = models.DateTimeField(blank=True, null=True)
+    completed_by = models.UUIDField(blank=True, null=True)
+    cancelled_at = models.DateTimeField(blank=True, null=True)
+    cancelled_by = models.UUIDField(blank=True, null=True)
+    cancellation_reason = models.TextField(blank=True, null=True)
+    rejected_at = models.DateTimeField(blank=True, null=True)
+    rejected_by = models.UUIDField(blank=True, null=True)
+    rejection_reason = models.TextField(blank=True, null=True)
 
     # ==========================================================================
     # Audit

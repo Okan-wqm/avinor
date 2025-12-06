@@ -627,6 +627,138 @@ class FlightService:
         logger.info(f"Flight {flight.id} cancelled by user {cancelled_by}")
         return flight
 
+    @classmethod
+    @transaction.atomic
+    def start_flight(
+        cls,
+        flight_id: uuid.UUID,
+        organization_id: uuid.UUID,
+        started_by: uuid.UUID,
+        hobbs_start: float = None,
+        tach_start: float = None,
+        actual_departure: str = None,
+    ) -> Flight:
+        """
+        Start a flight - transition to in_progress status.
+
+        Args:
+            flight_id: Flight UUID
+            organization_id: Organization UUID
+            started_by: User UUID starting the flight
+            hobbs_start: Starting Hobbs meter reading
+            tach_start: Starting Tach meter reading
+            actual_departure: Actual departure datetime string
+
+        Returns:
+            Updated Flight instance
+        """
+        flight = cls.get_flight(flight_id, organization_id)
+
+        # Validate state transition
+        valid_states = [Flight.Status.DRAFT, Flight.Status.SCHEDULED, Flight.Status.PLANNED]
+        if flight.flight_status not in valid_states:
+            raise FlightStateError(
+                current_state=flight.flight_status,
+                target_state=Flight.Status.IN_PROGRESS,
+                message=f"Cannot start flight from {flight.flight_status} status"
+            )
+
+        flight.flight_status = Flight.Status.IN_PROGRESS
+        flight.started_at = timezone.now()
+        flight.started_by = started_by
+
+        if hobbs_start is not None:
+            flight.hobbs_start = hobbs_start
+        if tach_start is not None:
+            flight.tach_start = tach_start
+        if actual_departure:
+            from datetime import datetime
+            if isinstance(actual_departure, str):
+                flight.actual_departure_time = datetime.fromisoformat(actual_departure.replace('Z', '+00:00'))
+            else:
+                flight.actual_departure_time = actual_departure
+
+        flight.save()
+
+        logger.info(f"Flight {flight.id} started by user {started_by}")
+        return flight
+
+    @classmethod
+    @transaction.atomic
+    def complete_flight(
+        cls,
+        flight_id: uuid.UUID,
+        organization_id: uuid.UUID,
+        completed_by: uuid.UUID,
+        hobbs_end: float = None,
+        tach_end: float = None,
+        actual_arrival: str = None,
+        fuel_used: float = None,
+        remarks: str = None,
+    ) -> Flight:
+        """
+        Complete a flight - transition to completed status.
+
+        Args:
+            flight_id: Flight UUID
+            organization_id: Organization UUID
+            completed_by: User UUID completing the flight
+            hobbs_end: Ending Hobbs meter reading
+            tach_end: Ending Tach meter reading
+            actual_arrival: Actual arrival datetime string
+            fuel_used: Fuel used during flight (liters)
+            remarks: Post-flight remarks
+
+        Returns:
+            Updated Flight instance
+        """
+        flight = cls.get_flight(flight_id, organization_id)
+
+        # Validate state transition
+        if flight.flight_status != Flight.Status.IN_PROGRESS:
+            raise FlightStateError(
+                current_state=flight.flight_status,
+                target_state=Flight.Status.COMPLETED,
+                message=f"Cannot complete flight from {flight.flight_status} status. Flight must be in progress."
+            )
+
+        flight.flight_status = Flight.Status.COMPLETED
+        flight.completed_at = timezone.now()
+        flight.completed_by = completed_by
+
+        if hobbs_end is not None:
+            flight.hobbs_end = hobbs_end
+            # Calculate flight time if both readings available
+            if flight.hobbs_start is not None:
+                flight.total_hobbs_time = hobbs_end - flight.hobbs_start
+
+        if tach_end is not None:
+            flight.tach_end = tach_end
+            # Calculate tach time if both readings available
+            if flight.tach_start is not None:
+                flight.total_tach_time = tach_end - flight.tach_start
+
+        if actual_arrival:
+            from datetime import datetime
+            if isinstance(actual_arrival, str):
+                flight.actual_arrival_time = datetime.fromisoformat(actual_arrival.replace('Z', '+00:00'))
+            else:
+                flight.actual_arrival_time = actual_arrival
+
+        if fuel_used is not None:
+            flight.fuel_used = fuel_used
+
+        if remarks:
+            if flight.remarks:
+                flight.remarks = f"{flight.remarks}\n\nPost-flight: {remarks}"
+            else:
+                flight.remarks = f"Post-flight: {remarks}"
+
+        flight.save()
+
+        logger.info(f"Flight {flight.id} completed by user {completed_by}")
+        return flight
+
     # ==========================================================================
     # Signature Operations
     # ==========================================================================
