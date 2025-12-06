@@ -65,6 +65,35 @@ from .validity_serializers import (
     StudentProgressSerializer,
     InstructorValiditySerializer,
 )
+from .language_proficiency_serializers import (
+    LanguageProficiencySerializer,
+    LanguageProficiencyCreateSerializer,
+    LanguageTestHistorySerializer,
+    LanguageProficiencyValiditySerializer,
+    LanguageProficiencyVerifySerializer,
+)
+from .flight_review_serializers import (
+    FlightReviewSerializer,
+    FlightReviewCreateSerializer,
+    SkillTestSerializer,
+    SkillTestCreateSerializer,
+    FlightReviewValiditySerializer,
+    FlightReviewVerifySerializer,
+)
+from .ftl_serializers import (
+    FTLConfigurationSerializer,
+    DutyPeriodSerializer,
+    DutyPeriodStartSerializer,
+    DutyPeriodEndSerializer,
+    RestPeriodSerializer,
+    RestPeriodCreateSerializer,
+    FTLViolationSerializer,
+    FTLViolationResolveSerializer,
+    PilotFTLSummarySerializer,
+    FTLComplianceCheckSerializer,
+    FTLPlanValidationSerializer,
+    FTLPlanValidationResponseSerializer,
+)
 
 __all__ = [
     # Certificate
@@ -121,4 +150,30 @@ __all__ = [
     'OrganizationComplianceSerializer',
     'StudentProgressSerializer',
     'InstructorValiditySerializer',
+    # Language Proficiency
+    'LanguageProficiencySerializer',
+    'LanguageProficiencyCreateSerializer',
+    'LanguageTestHistorySerializer',
+    'LanguageProficiencyValiditySerializer',
+    'LanguageProficiencyVerifySerializer',
+    # Flight Review
+    'FlightReviewSerializer',
+    'FlightReviewCreateSerializer',
+    'SkillTestSerializer',
+    'SkillTestCreateSerializer',
+    'FlightReviewValiditySerializer',
+    'FlightReviewVerifySerializer',
+    # FTL
+    'FTLConfigurationSerializer',
+    'DutyPeriodSerializer',
+    'DutyPeriodStartSerializer',
+    'DutyPeriodEndSerializer',
+    'RestPeriodSerializer',
+    'RestPeriodCreateSerializer',
+    'FTLViolationSerializer',
+    'FTLViolationResolveSerializer',
+    'PilotFTLSummarySerializer',
+    'FTLComplianceCheckSerializer',
+    'FTLPlanValidationSerializer',
+    'FTLPlanValidationResponseSerializer',
 ]

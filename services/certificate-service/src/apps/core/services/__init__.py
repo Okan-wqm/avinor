@@ -3,15 +3,25 @@
 Certificate Service Business Logic
 
 Service layer for certificate management operations.
+Includes language proficiency, flight reviews, FTL compliance,
+pilot age limit validation per EASA FCL.065 / FAA Part 121,
+and currency rules per EASA FCL.060 / FAA 14 CFR 61.57.
 """
 
 from .certificate_service import CertificateService
 from .medical_service import MedicalService
 from .rating_service import RatingService
 from .endorsement_service import EndorsementService
-from .currency_service import CurrencyService
+from .currency_service import (
+    CurrencyService,
+    EASACurrencyRules,
+    FAACurrencyRules,
+)
 from .verification_service import VerificationService
-from .validity_service import ValidityService
+from .validity_service import ValidityService, AgeLimit
+from .language_proficiency_service import LanguageProficiencyService
+from .flight_review_service import FlightReviewService
+from .ftl_service import FTLService
 
 __all__ = [
     'CertificateService',
@@ -19,6 +29,12 @@ __all__ = [
     'RatingService',
     'EndorsementService',
     'CurrencyService',
+    'EASACurrencyRules',
+    'FAACurrencyRules',
     'VerificationService',
     'ValidityService',
+    'AgeLimit',
+    'LanguageProficiencyService',
+    'FlightReviewService',
+    'FTLService',
 ]

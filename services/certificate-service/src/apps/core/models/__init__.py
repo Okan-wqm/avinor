@@ -3,6 +3,7 @@
 Certificate Service Models
 
 Database models for certificate, license, and rating management.
+Includes language proficiency, flight reviews, FTL compliance.
 """
 
 from .certificate import (
@@ -39,6 +40,30 @@ from .verification import (
     VerificationMethod,
     VerificationStatus,
 )
+from .language_proficiency import (
+    LanguageProficiency,
+    LanguageTestHistory,
+    LanguageCode,
+    ProficiencyLevel,
+    LanguageProficiencyStatus,
+)
+from .flight_review import (
+    FlightReview,
+    FlightReviewType,
+    FlightReviewResult,
+    FlightReviewStatus,
+    SkillTest,
+)
+from .flight_time_limitations import (
+    FTLConfiguration,
+    DutyPeriod,
+    DutyType,
+    RestPeriod,
+    FTLViolation,
+    FTLViolationType,
+    PilotFTLSummary,
+    FTLStandard,
+)
 
 __all__ = [
     # Certificate
@@ -69,4 +94,25 @@ __all__ = [
     'CertificateVerification',
     'VerificationMethod',
     'VerificationStatus',
+    # Language Proficiency
+    'LanguageProficiency',
+    'LanguageTestHistory',
+    'LanguageCode',
+    'ProficiencyLevel',
+    'LanguageProficiencyStatus',
+    # Flight Review
+    'FlightReview',
+    'FlightReviewType',
+    'FlightReviewResult',
+    'FlightReviewStatus',
+    'SkillTest',
+    # Flight Time Limitations
+    'FTLConfiguration',
+    'DutyPeriod',
+    'DutyType',
+    'RestPeriod',
+    'FTLViolation',
+    'FTLViolationType',
+    'PilotFTLSummary',
+    'FTLStandard',
 ]
